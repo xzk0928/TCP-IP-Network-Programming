@@ -1,0 +1,5 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     "/Users/xzk/Downloads/class/class/内功修炼/TCP-IP-Network-Programming/ch01-理解网络编程和套接字/hello_server"
+relocations:     []
+...
