@@ -8,7 +8,7 @@
 
 void error_handling(char *message);
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     int sock;
     struct sockaddr_in serv_addr;
@@ -16,14 +16,14 @@ int main(int argc, char* argv[])
     int str_len = 0;
     int idx = 0, read_len = 0;
 
-    if(argc != 3)
+    if (argc != 3)
     {
         printf("Usage: %s <IP> <port>", argv[0]);
         exit(1);
     }
 
     sock = socket(PF_INET, SOCK_STREAM, 0);
-    if(sock == -1)
+    if (sock == -1)
         error_handling("socket() error");
 
     memset(&serv_addr, 0, sizeof(serv_addr));
@@ -31,19 +31,34 @@ int main(int argc, char* argv[])
     serv_addr.sin_addr.s_addr = inet_addr(argv[1]);
     serv_addr.sin_port = htons(atoi(argv[2]));
 
-    if(connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) == -1)
+    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == -1)
         error_handling("connect() error");
-
-    while(read_len = read(sock, &message[idx++], 1))
+    // 在 connect 成功之后加入
+    int i;
+    for (i = 0; i < 3000; i++)
     {
-        if(read_len == -1)
-            error_handling("read() error");
-
-        str_len += read_len;
+        printf("Wait time %d \n", i);
     }
 
-    printf("Message from server: %s\n", message);
-    printf("Function read call count: %d\n", str_len);
+    // 然后把原本那个逐字节读取的 while 循环改掉
+    // 改成只调用一次 read
+    str_len = read(sock, message, sizeof(message) - 1);
+    if (str_len == -1)
+        error_handling("read() error!");
+
+    printf("Message from server: %s \n", message);
+    printf("Function read call count: 1 \n"); // 此时只调用了1次
+
+    // while(read_len = read(sock, &message[idx++], 1))
+    // {
+    //     if(read_len == -1)
+    //         error_handling("read() error");
+
+    //     str_len += read_len;
+    // }
+
+    // printf("Message from server: %s\n", message);
+    // printf("Function read call count: %d\n", str_len);
     close(sock);
 
     return 0;
